@@ -3,15 +3,20 @@ import os
 import json
 import re
 
+
 def _get_credentials():
     # Compute credentials path relative to this file. Assumes credentials are located one level up in "credentials\config.json"
-    cred_path = os.path.join(os.path.dirname(__file__), "..", "credentials", "config.json")
+    cred_path = os.path.join(
+        os.path.dirname(__file__), "..", "credentials", "config.json"
+    )
     with open(cred_path) as f:
         creds = json.load(f)
     return creds["IMGFLIP_USERNAME"], creds["IMGFLIP_PASSWORD"]
 
+
 def sanitize_filename(name):
     return re.sub(r"[^\w\-]", "_", name)
+
 
 def create_meme_text(template_id, username, password, text0, text1=""):
     url = "https://api.imgflip.com/caption_image"
@@ -25,6 +30,7 @@ def create_meme_text(template_id, username, password, text0, text1=""):
     resp = requests.post(url, data=params)
     return resp.json()
 
+
 def create_meme_boxes(template_id, username, password, boxes):
     url = "https://api.imgflip.com/caption_image"
     params = {
@@ -36,6 +42,7 @@ def create_meme_boxes(template_id, username, password, boxes):
         params[f"boxes[{i}][text]"] = box["text"]
     resp = requests.post(url, data=params)
     return resp.json()
+
 
 def _get_next_index(dataset_dir):
     max_index = 0
@@ -50,7 +57,24 @@ def _get_next_index(dataset_dir):
                     pass
     return max_index + 1
 
+
 def create(json_data):
+    """
+    Creates a meme image using the provided template and text boxes.
+
+    Parameters:
+        json_data (dict): Dictionary with keys:
+            - "template_id": ID of the meme template.
+            - "boxes": List of texts for the meme. For one or two texts, they will map to text0 and text1;
+              for more texts, multiple boxes are created.
+
+    Returns:
+        str: A label for the new meme, which is used to name the saved image and JSON metadata file.
+
+    Raises:
+        ValueError: If "template_id" or "boxes" is missing or if "boxes" is an empty list.
+        Exception: If the API response indicates failure or image download fails.
+    """
     # Expects a dict with keys "template_id" and "boxes" (list of texts)
     if "template_id" not in json_data or "boxes" not in json_data:
         raise ValueError("Missing 'template_id' or 'boxes' in input json")
