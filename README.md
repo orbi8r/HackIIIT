@@ -50,3 +50,55 @@ print("Video generated at:", output_video)
 ````
 
 Now, by first calling the `caption()` function repeatedly and then the `video()` function once, you can generate multiple memes and combine them into a single video output.
+
+## Hosting and Port Forwarding
+
+To run the API locally, use the command:
+```
+uvicorn main:app --host 0.0.0.0 --port 19227
+```
+
+This starts the server on all network interfaces on port 19227.
+
+### Using playit.gg
+
+For playit.gg users, set up your forwarding (Example):
+Remote: post-oracle.gl.at.ply.gg:52794 => Local: 127.0.0.1:19227
+
+Configure your playit.gg client with the above mapping so that incoming traffic on port 52794 is forwarded to your local server.
+
+## Connecting to the API from Another Machine
+
+If main.py is running and port forwarded (for example using playit.gg with the mapping:
+Remote: post-oracle.gl.at.ply.gg:52794 => Local: 127.0.0.1:19227),
+you can connect from another machine as follows:
+
+### Using curl
+```
+curl -X POST http://post-oracle.gl.at.ply.gg:52794/generate_video \
+-H "Content-Type: application/json" \
+-d '{"memes": [{"template_id": "112126428", "boxes": ["Example text 1", "Example text 2"]}]}' \
+--output remote_output.mp4
+```
+
+### Using Python requests
+````python
+import requests
+
+url = "http://post-oracle.gl.at.ply.gg:52794/generate_video"
+payload = {
+    "memes": [
+        {"template_id": "112126428", "boxes": ["Example text 1", "Example text 2"]}
+    ]
+}
+
+response = requests.post(url, json=payload)
+if response.status_code == 200:
+    with open("remote_output.mp4", "wb") as f:
+        f.write(response.content)
+    print("Video saved as remote_output.mp4")
+else:
+    print("API call failed with status", response.status_code)
+````
+
+Adjust the remote address as needed if you're not using playit.gg.
