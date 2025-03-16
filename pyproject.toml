@@ -4,5 +4,6 @@ version = "0.0.1"
 description = "This repo is for HackIIIT '25 hackathon FOSS work"
 requires-python = ">=3.13"
 dependencies = [
+    "moviepy>=2.1.2",
     "requests>=2.32.3",
 ]
