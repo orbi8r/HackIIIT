@@ -151,7 +151,13 @@ def video():
 
     # Step 4: Write the output video and clean up temporary files
     output_path = "output.mp4"
-    final_clip.write_videofile(output_path, fps=24)
+    final_clip.write_videofile(
+        output_path,
+        fps=24,
+        temp_audiofile="temp-audio.m4a",
+        remove_temp=True,
+        audio_codec="aac",  # specify valid audio codec for m4a
+    )
 
     for clip in video_clips:
         clip.close()
